@@ -24,4 +24,17 @@ public class StockService {
 
         return repo.save(stock);
     }
+
+    public void reduceStock(Long productId, String outletId, int qty) {
+        Stock stock = repo
+                .findByProductIdAndOutletId(productId, outletId)
+                .orElseThrow(() -> new RuntimeException("Stock not found"));
+
+        if (stock.getQuantity() < qty) {
+            throw new RuntimeException("Not enough stock");
+        }
+
+        stock.setQuantity(stock.getQuantity() - qty);
+        repo.save(stock);
+    }
 }
