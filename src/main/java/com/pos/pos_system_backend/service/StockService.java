@@ -1,6 +1,7 @@
 package com.pos.pos_system_backend.service;
 
 import com.pos.pos_system_backend.entity.Stock;
+import com.pos.pos_system_backend.exception.InsufficientStockException;
 import com.pos.pos_system_backend.repository.StockRepository;
 import org.springframework.stereotype.Service;
 
@@ -28,10 +29,15 @@ public class StockService {
     public void reduceStock(Long productId, String outletId, int qty) {
         Stock stock = repo
                 .findByProductIdAndOutletId(productId, outletId)
-                .orElseThrow(() -> new RuntimeException("Stock not found"));
+                .orElseThrow(() -> new RuntimeException(
+                        "Stock not found for product " + productId + " in outlet " + outletId
+                ));
 
         if (stock.getQuantity() < qty) {
-            throw new RuntimeException("Not enough stock");
+//            throw new RuntimeException("Not enough stock");
+            throw new InsufficientStockException(
+                    "Product " + productId + " only has " + stock.getQuantity() + " items left"
+            );
         }
 
         stock.setQuantity(stock.getQuantity() - qty);
