@@ -27,4 +27,11 @@ public class ProductService {
         return repo.findByBarcode(barcode)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
     }
+
+    public void deleteProduct(Long id) {
+        if (!repo.existsById(id)) {
+            throw new RuntimeException("Product not found with id " + id);
+        }
+        repo.deleteById(id);
+    }
 }

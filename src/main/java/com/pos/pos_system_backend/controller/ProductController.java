@@ -31,4 +31,9 @@ public class ProductController {
     public Product getByBarcode(@PathVariable String barcode) {
         return service.getByBarcode(barcode);
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteProduct(@PathVariable Long id) {
+        service.deleteProduct(id);
+    }
 }
