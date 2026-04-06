@@ -12,6 +12,7 @@ public class Stock {
     private Long id;
 
     private Long productId;
+    private String productName;
     private String outletId;
     private int quantity;
 }
