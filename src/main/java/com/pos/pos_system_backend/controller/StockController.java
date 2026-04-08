@@ -21,7 +21,7 @@ public class StockController {
     @PostMapping()
     public Stock addStock(@RequestBody StockRequest req) {
         return service.addStock(
-                req.getProductId(),
+                req.getBarcode(),
                 req.getProductName(),
                 req.getOutletId(),
                 req.getQuantity()
@@ -39,11 +39,15 @@ public class StockController {
     }
 
     @PutMapping("/{id}")
-    public Stock updateStockQuantity(
+    public Stock updateStock(
             @PathVariable Long id,
-            @RequestParam int quantity
+            @RequestBody StockRequest req
     ) {
-        return service.updateStockQuantity(id, quantity);
+        return service.updateStockQuantity(
+                id,
+                req.getQuantity(),
+                req.getUser()
+        );
     }
 
     @DeleteMapping("/{id}")

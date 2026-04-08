@@ -11,8 +11,13 @@ public class Stock {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long productId;
+    private Long barcode;
     private String productName;
+
+//  @ManyToOne
+//  @JoinColumn(name = "barcode")
+//  @JoinColumn(name= "name")
+//  private Product product;
     private String outletId;
     private int quantity;
 }
