@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class SaleItem {
-    private Long productId;
+    private Long barcode;
     private int qty;
 }

@@ -24,7 +24,7 @@ public class SaleService {
 
         request.getItems().forEach(item -> {
             stockService.reduceStock(
-                    item.getProductId(),
+                    item.getBarcode(),
                     request.getOutletId(),
                     item.getQty()
             );
