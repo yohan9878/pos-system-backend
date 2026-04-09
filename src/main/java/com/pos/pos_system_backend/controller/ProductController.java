@@ -17,7 +17,7 @@ public class ProductController {
         this.service = service;
     }
 
-    @PostMapping
+    @PostMapping()
     public Product add(@RequestBody Product product) {
         return service.addProduct(product);
     }
@@ -28,7 +28,12 @@ public class ProductController {
     }
 
     @GetMapping("/{barcode}")
-    public Product getByBarcode(@PathVariable String barcode) {
+    public Product getByBarcode(@PathVariable Long barcode) {
         return service.getByBarcode(barcode);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteProduct(@PathVariable Long id) {
+        service.deleteProduct(id);
     }
 }

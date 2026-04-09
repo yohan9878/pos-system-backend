@@ -3,16 +3,25 @@ package com.pos.pos_system_backend.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 @Entity
-public class Stock {
+public class StockHistory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long barcode;
     private String productName;
+    private Long barcode;
     private String outletId;
-    private int quantity;
+
+    private int oldQuantity;
+    private int updatedQty;
+    private int newQuantity;
+
+    private String changedBy;
+
+    private LocalDateTime changedAt;
 }
