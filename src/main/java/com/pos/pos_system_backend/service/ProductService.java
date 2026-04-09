@@ -23,7 +23,7 @@ public class ProductService {
         return repo.findAll();
     }
 
-    public Product getByBarcode(String barcode) {
+    public Product getByBarcode(Long barcode) {
         return repo.findByBarcode(barcode)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
     }
