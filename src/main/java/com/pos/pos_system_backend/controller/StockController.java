@@ -22,7 +22,6 @@ public class StockController {
     public Stock addStock(@RequestBody StockRequest req) {
         return service.addStock(
                 req.getBarcode(),
-                req.getProductName(),
                 req.getOutletId(),
                 req.getQuantity()
         );
