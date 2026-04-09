@@ -3,7 +3,7 @@ package com.pos.pos_system_backend.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -23,5 +23,5 @@ public class StockHistory {
 
     private String changedBy;
 
-    private LocalDate changedAt;
+    private LocalDateTime changedAt;
 }
