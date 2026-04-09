@@ -1,15 +1,17 @@
 package com.pos.pos_system_backend.service;
 
+import com.pos.pos_system_backend.entity.Product;
 import com.pos.pos_system_backend.entity.Stock;
 import com.pos.pos_system_backend.entity.StockHistory;
 import com.pos.pos_system_backend.exception.InsufficientStockException;
+import com.pos.pos_system_backend.repository.ProductRepository;
 import com.pos.pos_system_backend.repository.StockHistoryRepository;
 import com.pos.pos_system_backend.repository.StockRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,23 +19,49 @@ import java.util.Optional;
 public class StockService {
 
     private final StockRepository repo;
+    private final ProductRepository productRepo;
 
     @Autowired
     private StockHistoryRepository stockHistoryRepository;
 
-    public StockService(StockRepository repo) {
+    public StockService(StockRepository repo, ProductRepository productRepo) {
         this.repo = repo;
+        this.productRepo = productRepo;
     }
 
-    public Stock addStock(Long barcode, String productName, String outletId, int qty) {
-        Stock stock = repo
-                .findByBarcodeAndOutletId(barcode, outletId)
-                .orElse(new Stock());
+    public Stock addStock(Long barcode, String outletId, int qty) {
+//        Stock stock = repo
+//                .findByBarcodeAndOutletId(barcode, outletId)
+//                .orElse(new Stock());
+//
+//        stock.setBarcode(barcode);
+//        stock.setProductName(productName);
+//        stock.setOutletId(outletId);
+//        stock.setQuantity(stock.getQuantity() + qty);
 
-        stock.setBarcode(barcode);
-        stock.setProductName(productName);
+        //Find product by barcode
+        Product product = productRepo.findByBarcode(barcode)
+                .orElseThrow(() -> new RuntimeException("Product not found with barcode: " + barcode));
+
+        Optional<Stock> existingStockOpt = repo.findByBarcodeAndOutletId(barcode, outletId);
+
+
+        if (existingStockOpt.isPresent()) {
+            // Option A: Update existing quantity
+//            Stock existingStock = existingStockOpt.get();
+//            existingStock.setQuantity(existingStock.getQuantity() + qty);
+//            return repo.save(existingStock);
+
+
+             throw new RuntimeException("Stock already exists for this product in this outlet");
+        }
+
+        // Create stock
+        Stock stock = new Stock();
+        stock.setBarcode(product.getBarcode());
+        stock.setProductName(product.getName()); // auto-fill productName
         stock.setOutletId(outletId);
-        stock.setQuantity(stock.getQuantity() + qty);
+        stock.setQuantity(qty);
 
         return repo.save(stock);
     }
@@ -87,7 +115,7 @@ public class StockService {
         history.setUpdatedQty(quantity);
         history.setNewQuantity(newQty);
         history.setChangedBy(user);
-        history.setChangedAt(LocalDate.now());
+        history.setChangedAt(LocalDateTime.now());
 
         stockHistoryRepository.save(history);
 
