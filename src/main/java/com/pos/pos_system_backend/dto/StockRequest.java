@@ -4,9 +4,9 @@ import lombok.Data;
 
 @Data
 public class StockRequest {
+    private Long id;
     private Long barcode;
-    private String productName;
     private String outletId;
-    private String user;
     private int quantity;
+    private String user;
 }
