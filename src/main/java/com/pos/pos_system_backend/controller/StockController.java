@@ -23,7 +23,10 @@ public class StockController {
         return service.addStock(
                 req.getBarcode(),
                 req.getOutletId(),
-                req.getQuantity()
+                req.getQuantity(),
+                req.getWeight(),
+                req.getLowStockThresholdQty(),
+                req.getLowStockThresholdWeight()
         );
     }
 
@@ -37,14 +40,16 @@ public class StockController {
         return service.getAllStock();
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{barcode}")
     public Stock updateStock(
-            @PathVariable Long id,
+            @PathVariable Long barcode,
             @RequestBody StockRequest req
     ) {
-        return service.updateStockQuantity(
-                id,
+        return service.updateStock(
+                barcode,
+                req.getOutletId(),
                 req.getQuantity(),
+                req.getWeight(),
                 req.getUser()
         );
     }
