@@ -17,9 +17,9 @@ public class StockHistory {
     private Long barcode;
     private String outletId;
 
-    private int oldQuantity;
-    private int updatedQty;
-    private int newQuantity;
+    private double oldStock;
+    private double updatedStock;
+    private double newStock;
 
     private String changedBy;
 
