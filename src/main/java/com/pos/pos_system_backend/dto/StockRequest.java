@@ -8,5 +8,8 @@ public class StockRequest {
     private Long barcode;
     private String outletId;
     private int quantity;
+    private double weight;
+    private int lowStockThresholdQty;
+    private double lowStockThresholdWeight;
     private String user;
 }
