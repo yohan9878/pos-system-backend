@@ -29,7 +29,7 @@ public class StockService {
         this.productRepo = productRepo;
     }
 
-    public Stock addStock(Long barcode, String outletId, int qty) {
+    public Stock addStock(Long barcode, String outletId, int qty, double weight, int thresholdQty, double thresholdWeight) {
 //        Stock stock = repo
 //                .findByBarcodeAndOutletId(barcode, outletId)
 //                .orElse(new Stock());
@@ -47,13 +47,7 @@ public class StockService {
 
 
         if (existingStockOpt.isPresent()) {
-            // Option A: Update existing quantity
-//            Stock existingStock = existingStockOpt.get();
-//            existingStock.setQuantity(existingStock.getQuantity() + qty);
-//            return repo.save(existingStock);
-
-
-             throw new RuntimeException("Stock already exists for this product in this outlet");
+            throw new RuntimeException("Stock already exists for this product in this outlet");
         }
 
         // Create stock
@@ -61,7 +55,10 @@ public class StockService {
         stock.setBarcode(product.getBarcode());
         stock.setProductName(product.getName()); // auto-fill productName
         stock.setOutletId(outletId);
+        stock.setWeight(weight);
         stock.setQuantity(qty);
+        stock.setLowStockThresholdQty(thresholdQty);
+        stock.setLowStockThresholdWeight(thresholdWeight);
 
         return repo.save(stock);
     }
@@ -84,6 +81,14 @@ public class StockService {
         repo.save(stock);
     }
 
+    public void reduceStockByWeight(Long barcode, String outletId, double weight) {
+        Stock stock = repo.findByBarcodeAndOutletId(barcode, outletId)
+                .orElseThrow(() -> new RuntimeException("Stock not found"));
+
+        stock.setWeight(stock.getWeight() - weight);
+        repo.save(stock);
+    }
+
 
     public List<Stock> getAllStock() {
         return repo.findAll();
@@ -93,31 +98,74 @@ public class StockService {
         return repo.findByOutletId(outletId);
     }
 
-    public Stock updateStockQuantity(Long id, int quantity, String user) {
-        Optional<Stock> stockOpt = repo.findById(id);
+    public Stock updateStock(Long barcode, String outletId, int qty, double weight, String user) {
+//        Optional<Stock> stockOpt = repo.findById(id);
+//        if (stockOpt.isEmpty()) {
+//            throw new RuntimeException("Stock not found with id " + id);
+//        }
+//        StockRequest req;
+//
+        Optional<Stock> stockOpt = repo.findByBarcodeAndOutletId(barcode, outletId);
         if (stockOpt.isEmpty()) {
-            throw new RuntimeException("Stock not found with id " + id);
+            throw new RuntimeException("Stock not found with id " + barcode);
         }
+
+        Product product = productRepo.findByBarcode(barcode)
+                .orElseThrow(() -> new RuntimeException("Product not found with barcode: " + barcode));
 
         //Update Stock
         Stock stock = stockOpt.get();
-        int oldQty = stock.getQuantity();
-        int newQty = oldQty + quantity;
-        stock.setQuantity(newQty);
-        Stock updatedStock = repo.save(stock);
 
         //Update stock history
         StockHistory history = new StockHistory();
         history.setProductName(stock.getProductName());
         history.setBarcode(stock.getBarcode());
         history.setOutletId(stock.getOutletId());
-        history.setOldQuantity(oldQty);
-        history.setUpdatedQty(quantity);
-        history.setNewQuantity(newQty);
         history.setChangedBy(user);
         history.setChangedAt(LocalDateTime.now());
 
+        if(product.isWeighted()){
+            //update stock weight
+            double oldWeight = stock.getWeight();
+            double newWeight = oldWeight + weight;
+            stock.setWeight(newWeight);
+
+            //update stock history
+            history.setOldStock(oldWeight);
+            history.setUpdatedStock(weight);
+            history.setNewStock(newWeight);
+
+        }else{
+            //update stock Qty
+            int oldQty = stock.getQuantity();
+            int newQty = oldQty + qty;
+            stock.setQuantity(newQty);
+
+            //update stock history
+            history.setOldStock(oldQty);
+            history.setUpdatedStock(qty);
+            history.setNewStock(newQty);
+        }
+        Stock updatedStock = repo.save(stock);
         stockHistoryRepository.save(history);
+//        Stock stock = stockOpt.get();
+//        int oldQty = stock.getQuantity();
+//        int newQty = oldQty + quantity;
+//        stock.setQuantity(newQty);
+//        Stock updatedStock = repo.save(stock);
+
+
+
+//        history.setProductName(stock.getProductName());
+//        history.setBarcode(stock.getBarcode());
+//        history.setOutletId(stock.getOutletId());
+//        history.setOldQuantity(oldQty);
+//        history.setUpdatedQty(quantity);
+//        history.setNewQuantity(newQty);
+//        history.setChangedBy(user);
+//        history.setChangedAt(LocalDateTime.now());
+
+
 
         return updatedStock;
     }
