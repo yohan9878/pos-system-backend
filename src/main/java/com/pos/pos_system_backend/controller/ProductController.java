@@ -1,5 +1,6 @@
 package com.pos.pos_system_backend.controller;
 
+import com.pos.pos_system_backend.dto.ProductRequest;
 import com.pos.pos_system_backend.entity.Product;
 import com.pos.pos_system_backend.service.ProductService;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +19,8 @@ public class ProductController {
     }
 
     @PostMapping()
-    public Product add(@RequestBody Product product) {
-        return service.addProduct(product);
+    public Product add(@RequestBody ProductRequest req) {
+        return service.addProduct(req);
     }
 
     @GetMapping
