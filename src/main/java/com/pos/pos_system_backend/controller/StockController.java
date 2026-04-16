@@ -1,6 +1,7 @@
 package com.pos.pos_system_backend.controller;
 
 import com.pos.pos_system_backend.dto.StockRequest;
+import com.pos.pos_system_backend.dto.StockUpdateRequest;
 import com.pos.pos_system_backend.entity.Stock;
 import com.pos.pos_system_backend.service.StockService;
 import org.springframework.web.bind.annotation.*;
@@ -40,16 +41,14 @@ public class StockController {
         return service.getAllStock();
     }
 
-    @PutMapping("/{barcode}")
+    @PutMapping("/{id}")
     public Stock updateStock(
-            @PathVariable Long barcode,
-            @RequestBody StockRequest req
+            @PathVariable Long id,
+            @RequestBody StockUpdateRequest req
     ) {
         return service.updateStock(
-                barcode,
-                req.getOutletId(),
-                req.getQuantity(),
-                req.getWeight(),
+                id,
+                req.getValue(),
                 req.getUser()
         );
     }

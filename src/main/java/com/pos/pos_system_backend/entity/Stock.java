@@ -23,4 +23,5 @@ public class Stock {
 
     private int lowStockThresholdQty;
     private double lowStockThresholdWeight;
+    private boolean weighted;
 }
