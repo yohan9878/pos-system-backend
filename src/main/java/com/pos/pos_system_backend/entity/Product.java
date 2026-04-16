@@ -22,7 +22,7 @@ public class Product {
     private Double bulkPrice;
     private Double packPrice;
 
-    private Double packWeight;
+//    private Double packWeight;
 
     private boolean weighted;
 }
