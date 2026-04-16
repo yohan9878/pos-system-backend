@@ -61,7 +61,7 @@ public class ProductService {
                 throw new RuntimeException("Price per Kg required for weighted products");
             }
         } else {
-            if (req.getRetailPrice() <= 0 && req.getPackPrice() <= 0) {
+            if (req.getRetailPrice() <= 0 || req.getPackPrice() <= 0) {
                 throw new RuntimeException("Retail or Pack price required");
             }
         }
