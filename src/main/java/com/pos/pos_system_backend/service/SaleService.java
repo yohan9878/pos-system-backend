@@ -30,25 +30,9 @@ public class SaleService {
 
         double total = 0;
 
-//        request.getItems().forEach(item -> {
-//            stockService.reduceStock(
-//                    item.getBarcode(),
-//                    request.getOutletId(),
-//                    item.getQty()
-//            );
-//        });
-//
-//        Sale sale = new Sale();
-//        sale.setInvoiceNo(request.getInvoiceNo());
-//        sale.setOutletId(request.getOutletId());
-//        sale.setTotal(request.getTotal());
-//        sale.setDate(LocalDate.now().toString());
-//
-//        repo.save(sale);
-//    }
         for (SaleItem item : request.getItems()) {
 
-            Product product = productRepo.findById(item.getBarcode())
+            Product product = productRepo.findByBarcode(item.getBarcode())
                     .orElseThrow(() -> new RuntimeException("Product not found"));
 
             double itemTotal;
@@ -56,32 +40,26 @@ public class SaleService {
             //WEIGHT-BASED (Chicken)
             if (product.isWeighted()) {
 
-                itemTotal = (item.getWeight() / 1000) * product.getPricePerKg();
-
-                // 🔥 Deduct stock by weight
-                stockService.reduceStockByWeight(
-                        item.getBarcode(),
-                        request.getOutletId(),
-                        item.getWeight()
-                );
+                itemTotal = item.getValue() * product.getPricePerKg();
 
             } else {
 
+
                 double unitPrice = switch (item.getPriceType()) {
-                    case PACK -> product.getPackPrice();
-                    case BULK -> product.getBulkPrice();
+//                    case PACK -> product.getPackPrice();
+//                    case BULK -> product.getBulkPrice();
                     default -> product.getRetailPrice();
                 };
 
-                itemTotal = unitPrice * item.getQuantity();
+                itemTotal = unitPrice * item.getValue();
 
-                //Deduct stock by quantity
-                stockService.reduceStock(
-                        item.getBarcode(),
-                        request.getOutletId(),
-                        item.getQuantity()
-                );
             }
+
+            stockService.reduceStock(
+                    item.getBarcode(),
+                    request.getOutletId(),
+                    item.getValue()
+            );
 
             total += itemTotal;
         }
