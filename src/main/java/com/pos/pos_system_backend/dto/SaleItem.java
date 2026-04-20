@@ -15,8 +15,7 @@ public class SaleItem {
     private Long barcode;
     private String productName;
 
-    private int quantity;
-    private double weight; // grams
+    private double value;
 
     private double unitPrice;
     private double totalPrice;
