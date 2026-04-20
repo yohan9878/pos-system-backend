@@ -1,5 +1,6 @@
 package com.pos.pos_system_backend.service;
 
+import com.pos.pos_system_backend.dto.StockRequest;
 import com.pos.pos_system_backend.entity.Product;
 import com.pos.pos_system_backend.entity.Stock;
 import com.pos.pos_system_backend.entity.StockHistory;
@@ -29,68 +30,74 @@ public class StockService {
         this.productRepo = productRepo;
     }
 
-    public Stock addStock(Long barcode, String outletId, int qty, double weight, int thresholdQty, double thresholdWeight) {
+    //Long barcode, String outletId, int qty, double weight, int thresholdQty, double thresholdWeight
+    public Stock addStock(StockRequest req) {
 
-        //Find product by barcode
-        Product product = productRepo.findByBarcode(barcode)
-                .orElseThrow(() -> new RuntimeException("Product not found with barcode: " + barcode));
 
-        Optional<Stock> existingStockOpt = repo.findByBarcodeAndOutletId(barcode, outletId);
+
+        Product product = productRepo.findByBarcode(req.getBarcode())
+                .orElseThrow(() -> new RuntimeException("Product not found with barcode: " + req.getBarcode()));
+
+        Optional<Stock> existingStockOpt = repo.findByBarcodeAndOutletId(req.getBarcode(), req.getOutletId());
 
 
         if (existingStockOpt.isPresent()) {
             throw new RuntimeException("Stock already exists for this product in this outlet");
         }
 
+        validateStock(req, product);
         // Create stock
         Stock stock = new Stock();
         stock.setBarcode(product.getBarcode());
-        stock.setProductName(product.getName()); // auto-fill productName
+        stock.setProductName(product.getName());
         stock.setWeighted(product.isWeighted());
-        stock.setOutletId(outletId);
-        stock.setWeight(weight);
-        stock.setQuantity(qty);
-        stock.setLowStockThresholdQty(thresholdQty);
-        stock.setLowStockThresholdWeight(thresholdWeight);
+        stock.setOutletId(req.getOutletId());
+        stock.setWeight(req.getWeight());
+        stock.setQuantity(req.getQuantity());
+        stock.setLowStockThresholdQty(req.getLowStockThresholdQty());
+        stock.setLowStockThresholdWeight(req.getLowStockThresholdWeight());
 
-//        if (product.isWeighted()) {
-//            stock.setWeight(weight);
-//            stock.setQuantity(0);
-//            stock.setLowStockThresholdQty(0);
-//            stock.setLowStockThresholdWeight(thresholdWeight);
-//        } else {
-//            stock.setWeight(0);
-//            stock.setQuantity(qty);
-//            stock.setLowStockThresholdQty(thresholdQty);
-//            stock.setLowStockThresholdWeight(0);
-//
-//        }
 
         return repo.save(stock);
     }
 
-    public void reduceStock(Long barcode, String outletId, int qty) {
+
+    public void reduceStock(Long barcode, String outletId, double value) {
+
         Stock stock = repo
                 .findByBarcodeAndOutletId(barcode, outletId)
                 .orElseThrow(() -> new RuntimeException(
                         "Stock not found for product " + barcode + " in outlet " + outletId
                 ));
 
-        if (stock.getQuantity() < qty) {
-            throw new InsufficientStockException(
-                    "Product " + barcode + " only has " + stock.getQuantity() + " items left"
-            );
+        Product product = productRepo.findByBarcode(barcode)
+                .orElseThrow(() -> new RuntimeException(
+                        "Product not found with barcode: " + barcode
+                ));
+
+        if (product.isWeighted()) {
+            //WEIGHT LOGIC
+            if (stock.getWeight() < value) {
+                throw new InsufficientStockException(
+                        "Product " + barcode + " only has " + stock.getWeight() + " Kg left"
+                );
+            }
+
+            stock.setWeight(stock.getWeight() - value);
+
+        } else {
+            //QUANTITY LOGIC
+            int qty = (int) value;
+
+            if (stock.getQuantity() < qty) {
+                throw new InsufficientStockException(
+                        "Product " + barcode + " only has " + stock.getQuantity() + " items left"
+                );
+            }
+
+            stock.setQuantity(stock.getQuantity() - qty);
         }
 
-        stock.setQuantity(stock.getQuantity() - qty);
-        repo.save(stock);
-    }
-
-    public void reduceStockByWeight(Long barcode, String outletId, double weight) {
-        Stock stock = repo.findByBarcodeAndOutletId(barcode, outletId)
-                .orElseThrow(() -> new RuntimeException("Stock not found"));
-
-        stock.setWeight(stock.getWeight() - weight);
         repo.save(stock);
     }
 
@@ -109,12 +116,6 @@ public class StockService {
         if (stockOpt.isEmpty()) {
             throw new RuntimeException("Stock not found with id " + id);
         }
-
-//
-//        Optional<Stock> stockOpt = repo.findByBarcodeAndOutletId(barcode, outletId);
-//        if (stockOpt.isEmpty()) {
-//            throw new RuntimeException("Stock not found with id " + barcode);
-//        }
 
         Long barcode = stockOpt.get().getBarcode();
         Product product = productRepo.findByBarcode(barcode)
@@ -155,21 +156,6 @@ public class StockService {
         }
         Stock updatedStock = repo.save(stock);
         stockHistoryRepository.save(history);
-//        Stock stock = stockOpt.get();
-//        int oldQty = stock.getQuantity();
-//        int newQty = oldQty + quantity;
-//        stock.setQuantity(newQty);
-//        Stock updatedStock = repo.save(stock);
-
-
-//        history.setProductName(stock.getProductName());
-//        history.setBarcode(stock.getBarcode());
-//        history.setOutletId(stock.getOutletId());
-//        history.setOldQuantity(oldQty);
-//        history.setUpdatedQty(quantity);
-//        history.setNewQuantity(newQty);
-//        history.setChangedBy(user);
-//        history.setChangedAt(LocalDateTime.now());
 
 
         return updatedStock;
@@ -188,5 +174,22 @@ public class StockService {
         return stockHistoryRepository.findAll(
                 Sort.by(Sort.Direction.DESC, "changedAt")
         );
+    }
+
+    public void validateStock(StockRequest req, Product product) {
+
+        if (product.isWeighted()) {
+            if (req.getQuantity() != 0 || req.getLowStockThresholdQty() != 0) {
+                throw new RuntimeException("Quantity is not available for weighted products");
+            } else if (req.getWeight() == 0  || req.getLowStockThresholdWeight() == 0) {
+                throw new RuntimeException("Weight is required for weighted product stock");
+            }
+        } else {
+            if (req.getQuantity() == 0 || req.getLowStockThresholdQty() == 0) {
+                throw new RuntimeException("Quantity is required");
+            } else if (req.getWeight() != 0 || req.getLowStockThresholdWeight() != 0) {
+                throw new RuntimeException("Weight is not available for this product");
+            }
+        }
     }
 }
