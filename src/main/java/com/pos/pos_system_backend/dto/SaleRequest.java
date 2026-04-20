@@ -13,8 +13,7 @@ public class SaleRequest {
 
     public static class Item {
         private String barcode;
-        private int qty;
-        private double weight;
+        private double value;
         private PriceType priceType;
     }
 
