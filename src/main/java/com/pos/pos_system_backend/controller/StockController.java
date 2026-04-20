@@ -21,14 +21,7 @@ public class StockController {
 
     @PostMapping()
     public Stock addStock(@RequestBody StockRequest req) {
-        return service.addStock(
-                req.getBarcode(),
-                req.getOutletId(),
-                req.getQuantity(),
-                req.getWeight(),
-                req.getLowStockThresholdQty(),
-                req.getLowStockThresholdWeight()
-        );
+        return service.addStock(req);
     }
 
     @GetMapping
