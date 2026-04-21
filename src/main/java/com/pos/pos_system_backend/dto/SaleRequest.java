@@ -8,6 +8,7 @@ import java.util.List;
 public class SaleRequest {
     private String invoiceNo;
     private String outletId;
+    private double discountAmount;
 
     private List<SaleItem> items;
 
