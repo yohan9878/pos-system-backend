@@ -13,12 +13,7 @@ public class SaleItem {
     private Long id;
 
     private Long barcode;
-    private String productName;
-
     private double value;
-
-    private double unitPrice;
-    private double totalPrice;
 
     @Enumerated(EnumType.STRING)
     private PriceType priceType;
