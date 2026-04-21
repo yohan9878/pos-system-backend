@@ -1,5 +1,6 @@
 package com.pos.pos_system_backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -17,11 +18,12 @@ public class StockHistory {
     private Long barcode;
     private String outletId;
 
-    private int oldQuantity;
-    private int updatedQty;
-    private int newQuantity;
+    private double oldStock;
+    private double updatedStock;
+    private double newStock;
 
     private String changedBy;
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime changedAt;
 }

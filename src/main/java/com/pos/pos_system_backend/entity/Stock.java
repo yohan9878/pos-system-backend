@@ -5,6 +5,9 @@ import lombok.Data;
 
 @Data
 @Entity
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"barcode", "outletId"})
+})
 public class Stock {
 
     @Id
@@ -15,4 +18,10 @@ public class Stock {
     private String productName;
     private String outletId;
     private int quantity;
+
+    private double weight;
+
+    private int lowStockThresholdQty;
+    private double lowStockThresholdWeight;
+    private boolean weighted;
 }

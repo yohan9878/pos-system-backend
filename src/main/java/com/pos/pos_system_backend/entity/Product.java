@@ -11,9 +11,18 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true,nullable = false)
+    @Column(unique = true, nullable = false)
     private Long barcode;
 
     private String name;
-    private double price;
+
+    private double pricePerKg;
+
+    private Double retailPrice;
+    private Double bulkPrice;
+    private Double packPrice;
+
+//    private Double packWeight;
+
+    private boolean weighted;
 }

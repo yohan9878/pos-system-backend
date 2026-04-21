@@ -1,6 +1,7 @@
 package com.pos.pos_system_backend.controller;
 
 import com.pos.pos_system_backend.dto.StockRequest;
+import com.pos.pos_system_backend.dto.StockUpdateRequest;
 import com.pos.pos_system_backend.entity.Stock;
 import com.pos.pos_system_backend.service.StockService;
 import org.springframework.web.bind.annotation.*;
@@ -20,11 +21,7 @@ public class StockController {
 
     @PostMapping()
     public Stock addStock(@RequestBody StockRequest req) {
-        return service.addStock(
-                req.getBarcode(),
-                req.getOutletId(),
-                req.getQuantity()
-        );
+        return service.addStock(req);
     }
 
     @GetMapping
@@ -40,11 +37,11 @@ public class StockController {
     @PutMapping("/{id}")
     public Stock updateStock(
             @PathVariable Long id,
-            @RequestBody StockRequest req
+            @RequestBody StockUpdateRequest req
     ) {
-        return service.updateStockQuantity(
+        return service.updateStock(
                 id,
-                req.getQuantity(),
+                req.getValue(),
                 req.getUser()
         );
     }
