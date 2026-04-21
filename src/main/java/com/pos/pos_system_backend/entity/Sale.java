@@ -17,6 +17,7 @@ public class Sale {
 
     private String invoiceNo;
     private String outletId;
+    private double discountAmount;
     private double total;
 
     private LocalDateTime date;
