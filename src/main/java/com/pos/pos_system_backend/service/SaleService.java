@@ -26,11 +26,12 @@ public class SaleService {
     }
 
     @Transactional
-    public void processSale(SaleRequest request) {
+    public void processSale(SaleRequest req) {
 
         double total = 0;
+        double subtotal = 0;
 
-        for (SaleItem item : request.getItems()) {
+        for (SaleItem item : req.getItems()) {
 
             Product product = productRepo.findByBarcode(item.getBarcode())
                     .orElseThrow(() -> new RuntimeException("Product not found"));
@@ -57,17 +58,20 @@ public class SaleService {
 
             stockService.reduceStock(
                     item.getBarcode(),
-                    request.getOutletId(),
+                    req.getOutletId(),
                     item.getValue()
             );
 
-            total += itemTotal;
+            subtotal += itemTotal;
         }
 
-        //Save sale (backend-calculated total)
+        total = subtotal - req.getDiscountAmount();
+
+        //Save sale
         Sale sale = new Sale();
-        sale.setInvoiceNo(request.getInvoiceNo());
-        sale.setOutletId(request.getOutletId());
+        sale.setInvoiceNo(req.getInvoiceNo());
+        sale.setOutletId(req.getOutletId());
+        sale.setDiscountAmount(req.getDiscountAmount());
         sale.setTotal(total);
         sale.setDate(LocalDateTime.now());
 
