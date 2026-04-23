@@ -10,7 +10,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class SaleService {
@@ -24,13 +26,18 @@ public class SaleService {
         this.stockService = stockService;
         this.productRepo = productRepo;
     }
-
     @Transactional
     public void processSale(SaleRequest req) {
 
-        double total = 0;
         double subtotal = 0;
 
+        Sale sale = new Sale();
+        sale.setInvoiceNo(req.getInvoiceNo());
+        sale.setOutletId(req.getOutletId());
+        sale.setDiscountAmount(req.getDiscountAmount());
+        sale.setDate(LocalDateTime.now());
+
+        // attach items to sale
         for (SaleItem item : req.getItems()) {
 
             Product product = productRepo.findByBarcode(item.getBarcode())
@@ -38,22 +45,15 @@ public class SaleService {
 
             double itemTotal;
 
-            //WEIGHT-BASED (Chicken)
             if (product.isWeighted()) {
-
                 itemTotal = item.getValue() * product.getPricePerKg();
-
             } else {
-
-
                 double unitPrice = switch (item.getPriceType()) {
-//                    case PACK -> product.getPackPrice();
-//                    case BULK -> product.getBulkPrice();
+                    case BULK -> product.getBulkPrice();
+                    case PACK -> product.getPackPrice();
                     default -> product.getRetailPrice();
                 };
-
                 itemTotal = unitPrice * item.getValue();
-
             }
 
             stockService.reduceStock(
@@ -63,19 +63,39 @@ public class SaleService {
             );
 
             subtotal += itemTotal;
+
+            item.setSale(sale);
         }
 
-        total = subtotal - req.getDiscountAmount();
+        sale.setTotal(subtotal - req.getDiscountAmount());
 
-        //Save sale
-        Sale sale = new Sale();
-        sale.setInvoiceNo(req.getInvoiceNo());
-        sale.setOutletId(req.getOutletId());
-        sale.setDiscountAmount(req.getDiscountAmount());
-        sale.setTotal(total);
-        sale.setDate(LocalDateTime.now());
+        sale.setItems(req.getItems());
 
         repo.save(sale);
+
+
+    }
+
+    public Sale saveSale(Sale sale) {
+
+        // link each item to parent sale
+        for (SaleItem item : sale.getItems()) {
+            item.setSale(sale);
+        }
+
+        return repo.save(sale);
+    }
+
+    public List<Sale> getAll() {
+        return repo.findAll();
+    }
+
+    public List<Sale> getSalesByDateAndOutletId(LocalDate date, String outletId) {
+
+        LocalDateTime start = date.atStartOfDay();
+        LocalDateTime end = date.atTime(23, 59, 59);
+
+        return repo.findByDateAndOutletId(start, end, outletId);
     }
 
 }
