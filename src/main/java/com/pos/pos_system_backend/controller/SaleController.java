@@ -37,9 +37,5 @@ public class SaleController {
         return ResponseEntity.ok(sales);
     }
 
-    @GetMapping
-    public List<Sale> getAll() {
-        return service.getAll();
-    }
 
 }
