@@ -8,5 +8,6 @@ public class DailyReportResponse {
     private String date;
     private String outletId;
     private double totalSales;
+    private double discountAmount;
     private long totalTransactions;
 }

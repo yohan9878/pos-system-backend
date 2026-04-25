@@ -12,6 +12,9 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
     @Query("SELECT COALESCE(" + "SUM(s.total),0) " + "FROM Sale s " + "WHERE s.outletId = :outletId AND s.date BETWEEN :start AND :end")
     double getTotalSales(@Param("outletId") String outletId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
+    @Query("SELECT COALESCE(" + "SUM(s.discountAmount),0) " + "FROM Sale s " + "WHERE s.outletId = :outletId AND s.date BETWEEN :start AND :end")
+    double getTotalDiscount(@Param("outletId") String outletId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
     @Query("SELECT COUNT(s) FROM Sale s WHERE s.outletId = :outletId AND s.date BETWEEN :start AND :end")
     long getTotalTransactions(@Param("outletId") String outletId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 

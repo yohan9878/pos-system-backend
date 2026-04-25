@@ -37,12 +37,14 @@ public class ReportService {
 
     public DailyReportResponse buildReport(String outletId, LocalDateTime start, LocalDateTime end, String date) {
 
+        double totalDiscount = repo.getTotalDiscount(outletId,start, end);
         double totalSales = repo.getTotalSales(outletId, start, end);
         long totalTransactions = repo.getTotalTransactions(outletId, start, end);
 
         DailyReportResponse res = new DailyReportResponse();
         res.setDate(date);
         res.setOutletId(outletId);
+        res.setDiscountAmount(totalDiscount);
         res.setTotalSales(totalSales);
         res.setTotalTransactions(totalTransactions);
 
