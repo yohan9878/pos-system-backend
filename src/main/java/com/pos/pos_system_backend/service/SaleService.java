@@ -76,20 +76,6 @@ public class SaleService {
 
     }
 
-    public Sale saveSale(Sale sale) {
-
-        // link each item to parent sale
-        for (SaleItem item : sale.getItems()) {
-            item.setSale(sale);
-        }
-
-        return repo.save(sale);
-    }
-
-    public List<Sale> getAll() {
-        return repo.findAll();
-    }
-
     public List<Sale> getSalesByDateAndOutletId(LocalDate date, String outletId) {
 
         LocalDateTime start = date.atStartOfDay();
