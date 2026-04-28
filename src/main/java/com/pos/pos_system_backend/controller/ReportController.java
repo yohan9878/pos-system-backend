@@ -1,6 +1,7 @@
 package com.pos.pos_system_backend.controller;
 
 import com.pos.pos_system_backend.dto.DailyReportResponse;
+import com.pos.pos_system_backend.dto.SoldItemReport;
 import com.pos.pos_system_backend.service.ReportService;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,5 +24,14 @@ public class ReportController {
             @RequestParam(required = false) String outletId
     ) {
         return service.getDailyReport(date, outletId);
+    }
+
+
+    @GetMapping("/items")
+    public List<SoldItemReport> getSoldItems(
+            @RequestParam String outletId,
+            @RequestParam String date
+    ) {
+        return service.getSoldItems(outletId, date);
     }
 }

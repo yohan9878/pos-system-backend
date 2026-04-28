@@ -1,6 +1,8 @@
 package com.pos.pos_system_backend.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pos.pos_system_backend.PriceType;
+import com.pos.pos_system_backend.entity.Sale;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -17,4 +19,10 @@ public class SaleItem {
 
     @Enumerated(EnumType.STRING)
     private PriceType priceType;
+
+    @ManyToOne
+    @JoinColumn(name = "sale_id")
+    @JsonIgnore
+    private Sale sale;
+
 }

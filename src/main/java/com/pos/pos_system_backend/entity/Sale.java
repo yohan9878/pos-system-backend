@@ -22,7 +22,7 @@ public class Sale {
 
     private LocalDateTime date;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL)
     private List<SaleItem> items;
 
 }

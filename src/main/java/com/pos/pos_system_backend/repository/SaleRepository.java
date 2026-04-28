@@ -12,14 +12,49 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
     @Query("SELECT COALESCE(" + "SUM(s.total),0) " + "FROM Sale s " + "WHERE s.outletId = :outletId AND s.date BETWEEN :start AND :end")
     double getTotalSales(@Param("outletId") String outletId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
+    @Query("SELECT COALESCE(" + "SUM(s.discountAmount),0) " + "FROM Sale s " + "WHERE s.outletId = :outletId AND s.date BETWEEN :start AND :end")
+    double getTotalDiscount(@Param("outletId") String outletId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
     @Query("SELECT COUNT(s) FROM Sale s WHERE s.outletId = :outletId AND s.date BETWEEN :start AND :end")
     long getTotalTransactions(@Param("outletId") String outletId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
-//    List<Sale> findByDate(String date);
-//
-//    List<Sale> findByOutletIdAndDate(String outletId, String date);
 
     @Query("SELECT DISTINCT s.outletId FROM Sale s WHERE s.date >= :start AND s.date < :end")
-    List<String> findDistinctOutletIdsBetween( @Param("start") LocalDateTime start,
-                                        @Param("end") LocalDateTime end);
+    List<String> findDistinctOutletIdsBetween(@Param("start") LocalDateTime start,
+                                              @Param("end") LocalDateTime end);
+
+    @Query("""
+            SELECT 
+                p.barcode,
+                p.name,
+                SUM(si.value),
+                CASE 
+                    WHEN si.priceType = 'RETAIL' THEN p.retailPrice
+                    ELSE p.bulkPrice
+                END,
+                SUM(si.value * 
+                    CASE 
+                        WHEN si.priceType = 'RETAIL' THEN p.retailPrice
+                        ELSE p.bulkPrice
+                    END
+                )
+            FROM SaleItem si
+            JOIN si.sale s
+            JOIN Product p ON p.barcode = si.barcode
+            WHERE s.outletId = :outletId
+            AND s.date >= :start AND s.date < :end
+            GROUP BY p.barcode, p.name, si.priceType, p.retailPrice, p.bulkPrice
+            """)
+    List<Object[]> getSoldItemsReport(
+            @Param("outletId") String outletId,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end
+    );
+
+    @Query("SELECT s FROM Sale s WHERE s.date BETWEEN :start AND :end AND s.outletId = :outletId")
+    List<Sale> findByDateAndOutletId(
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end,
+            @Param("outletId") String outletId
+    );
 }
