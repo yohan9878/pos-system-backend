@@ -14,7 +14,7 @@ public class SaleItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long barcode;
+    private String barcode;
     private double value;
 
     @Enumerated(EnumType.STRING)

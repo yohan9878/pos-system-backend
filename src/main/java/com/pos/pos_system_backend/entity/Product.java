@@ -12,7 +12,7 @@ public class Product {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private Long barcode;
+    private String barcode;
 
     private String name;
 

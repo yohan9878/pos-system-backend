@@ -7,6 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface StockRepository extends JpaRepository<Stock, Long> {
-    Optional<Stock> findByBarcodeAndOutletId(Long barcode, String outletId);
+    Optional<Stock> findByBarcodeAndOutletId(String barcode, String outletId);
     List<Stock> findByOutletId(String outletId);
 }

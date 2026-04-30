@@ -14,7 +14,7 @@ public class Stock {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long barcode;
+    private String barcode;
     private String productName;
     private String outletId;
     private int quantity;

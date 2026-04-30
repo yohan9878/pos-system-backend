@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class ProductRequest {
 
-    private Long barcode;
+    private String barcode;
 
     private String name;
 

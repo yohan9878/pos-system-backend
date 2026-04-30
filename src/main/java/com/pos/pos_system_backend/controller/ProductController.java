@@ -29,7 +29,7 @@ public class ProductController {
     }
 
     @GetMapping("/{barcode}")
-    public Product getByBarcode(@PathVariable Long barcode) {
+    public Product getByBarcode(@PathVariable String barcode) {
         return service.getByBarcode(barcode);
     }
 

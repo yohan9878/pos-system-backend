@@ -15,7 +15,7 @@ public class StockHistory {
     private Long id;
 
     private String productName;
-    private Long barcode;
+    private String barcode;
     private String outletId;
 
     private double oldStock;
