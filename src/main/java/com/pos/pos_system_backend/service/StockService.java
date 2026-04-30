@@ -62,7 +62,7 @@ public class StockService {
     }
 
 
-    public void reduceStock(Long barcode, String outletId, double value) {
+    public void reduceStock(String barcode, String outletId, double value) {
 
         Stock stock = repo
                 .findByBarcodeAndOutletId(barcode, outletId)
@@ -117,7 +117,7 @@ public class StockService {
             throw new RuntimeException("Stock not found with id " + id);
         }
 
-        Long barcode = stockOpt.get().getBarcode();
+        String barcode = stockOpt.get().getBarcode();
         Product product = productRepo.findByBarcode(barcode)
                 .orElseThrow(() -> new RuntimeException("Product not found with barcode: " + barcode));
 
