@@ -1,5 +1,6 @@
 package com.pos.pos_system_backend.config;
 
+import jakarta.annotation.Nullable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.*;
@@ -11,12 +12,12 @@ public class WebConfig {
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
-            public void addCorsMappings(CorsRegistry  registry) {
+            public void addCorsMappings(@Nullable CorsRegistry registry) {
+                assert registry != null;
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000")
-                        .allowedMethods("*");
-//                        .allowedHeaders("*")
-//                        .allowCredentials(true);
+                        .allowedOrigins("http://localhost:3000")// later update with Vercel url
+                        .allowedMethods("*")
+                        .allowCredentials(true);
             }
         };
     }
