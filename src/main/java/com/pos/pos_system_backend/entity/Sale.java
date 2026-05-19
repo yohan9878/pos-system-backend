@@ -15,7 +15,9 @@ public class Sale {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     private String invoiceNo;
+
     private String outletId;
     private double discountAmount;
     private double total;
