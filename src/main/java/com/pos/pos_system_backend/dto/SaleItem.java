@@ -21,7 +21,8 @@ public class SaleItem {
     private PriceType priceType;
 
     @ManyToOne
-    @JoinColumn(name = "sale_id")
+    @JoinColumn(name = "invoice_no",
+            referencedColumnName = "invoiceNo")
     @JsonIgnore
     private Sale sale;
 

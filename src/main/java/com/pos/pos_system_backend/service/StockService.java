@@ -57,6 +57,26 @@ public class StockService {
         stock.setLowStockThresholdQty(req.getLowStockThresholdQty());
         stock.setLowStockThresholdWeight(req.getLowStockThresholdWeight());
 
+        //update history
+        StockHistory history = new StockHistory();
+        history.setBarcode(product.getBarcode());
+        history.setProductName(product.getName());
+        history.setOutletId(req.getOutletId());
+
+        if(product.isWeighted()) {
+            history.setNewStock(req.getWeight());
+        }else{
+            history.setNewStock(req.getQuantity());
+        }
+
+        history.setOldStock(0);
+        history.setUpdatedStock(0);
+        history.setChangedBy(req.getUser());
+        history.setChangedAt(LocalDateTime.now());
+        stockHistoryRepository.save(history);
+
+
+
 
         return repo.save(stock);
     }

@@ -1,6 +1,5 @@
 package com.pos.pos_system_backend.dto;
 
-import com.pos.pos_system_backend.PriceType;
 import lombok.Data;
 import java.util.List;
 
@@ -11,11 +10,5 @@ public class SaleRequest {
     private double discountAmount;
 
     private List<SaleItem> items;
-
-    public static class Item {
-        private String barcode;
-        private double value;
-        private PriceType priceType;
-    }
 
 }
