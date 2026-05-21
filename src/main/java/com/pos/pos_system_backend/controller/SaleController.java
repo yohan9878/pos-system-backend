@@ -37,5 +37,10 @@ public class SaleController {
         return ResponseEntity.ok(sales);
     }
 
+    @PutMapping("/cancel-last-sale")
+    public Sale cancelLastSale() {
+        return service.cancelLastSale();
+    }
+
 
 }

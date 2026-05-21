@@ -1,8 +1,7 @@
-package com.pos.pos_system_backend.dto;
+package com.pos.pos_system_backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.pos.pos_system_backend.PriceType;
-import com.pos.pos_system_backend.entity.Sale;
+import com.pos.pos_system_backend.enums.PriceType;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -23,6 +22,7 @@ public class SaleItem {
     @ManyToOne
     @JoinColumn(name = "invoice_no",
             referencedColumnName = "invoiceNo")
+
     @JsonIgnore
     private Sale sale;
 

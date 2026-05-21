@@ -1,6 +1,6 @@
 package com.pos.pos_system_backend.entity;
 
-import com.pos.pos_system_backend.dto.SaleItem;
+import com.pos.pos_system_backend.enums.SaleStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -21,6 +21,9 @@ public class Sale {
     private String outletId;
     private double discountAmount;
     private double total;
+
+    @Enumerated(EnumType.STRING)
+    private SaleStatus status = SaleStatus.ACTIVE;
 
     private LocalDateTime date;
 
