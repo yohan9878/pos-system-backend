@@ -1,11 +1,11 @@
 package com.pos.pos_system_backend.service;
 
-import com.pos.pos_system_backend.dto.SaleItem;
+import com.pos.pos_system_backend.entity.*;
 import com.pos.pos_system_backend.dto.SaleRequest;
-import com.pos.pos_system_backend.entity.Product;
-import com.pos.pos_system_backend.entity.Sale;
+import com.pos.pos_system_backend.enums.SaleStatus;
 import com.pos.pos_system_backend.repository.ProductRepository;
 import com.pos.pos_system_backend.repository.SaleRepository;
+import com.pos.pos_system_backend.repository.StockRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -19,13 +19,16 @@ public class SaleService {
 
     private final SaleRepository repo;
     private final StockService stockService;
+    private final StockRepository stockRepo;
     private final ProductRepository productRepo;
 
-    public SaleService(SaleRepository repo, StockService stockService, ProductRepository productRepo) {
+    public SaleService(SaleRepository repo, StockService stockService, StockRepository stockRepo, ProductRepository productRepo) {
         this.repo = repo;
         this.stockService = stockService;
+        this.stockRepo = stockRepo;
         this.productRepo = productRepo;
     }
+
     @Transactional
     public void processSale(SaleRequest req) {
 
@@ -36,6 +39,7 @@ public class SaleService {
         sale.setOutletId(req.getOutletId());
         sale.setDiscountAmount(req.getDiscountAmount());
         sale.setDate(LocalDateTime.now());
+        sale.setStatus(SaleStatus.ACTIVE);
 
         // attach items to sale
         for (SaleItem item : req.getItems()) {
@@ -82,6 +86,45 @@ public class SaleService {
         LocalDateTime end = date.atTime(23, 59, 59);
 
         return repo.findByDateAndOutletId(start, end, outletId);
+    }
+
+    @Transactional
+    public Sale cancelLastSale() {
+
+        // Find latest sale
+        Sale latestSale = repo.findTopByOrderByDateDesc()
+                .orElseThrow(() -> new RuntimeException("No sales found"));
+
+        // Prevent double cancel
+        if (latestSale.getStatus() == SaleStatus.CANCELLED) {
+            throw new RuntimeException("Last sale already cancelled");
+        }
+
+        // Restore stock
+        for (SaleItem item : latestSale.getItems()) {
+
+            Stock stock = stockRepo
+                    .findByBarcodeAndOutletId(
+                            item.getBarcode(),
+                            latestSale.getOutletId()
+                    )
+                    .orElseThrow(() ->
+                            new RuntimeException("Stock not found")
+                    );
+
+            if (stock.isWeighted()) {
+                stock.setWeight(stock.getWeight() + item.getValue());
+            } else {
+                stock.setQuantity(stock.getQuantity() + (int) item.getValue());
+            }
+
+            stockRepo.save(stock);
+        }
+
+        // Mark cancelled
+        latestSale.setStatus(SaleStatus.CANCELLED);
+
+        return repo.save(latestSale);
     }
 
 }

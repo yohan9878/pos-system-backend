@@ -7,15 +7,16 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface SaleRepository extends JpaRepository<Sale, Long> {
-    @Query("SELECT COALESCE(" + "SUM(s.total),0) " + "FROM Sale s " + "WHERE s.outletId = :outletId AND s.date BETWEEN :start AND :end")
+    @Query("SELECT COALESCE(" + "SUM(s.total),0) " + "FROM Sale s " + "WHERE s.outletId = :outletId AND s.status = 'ACTIVE' AND s.date BETWEEN :start AND :end")
     double getTotalSales(@Param("outletId") String outletId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
-    @Query("SELECT COALESCE(" + "SUM(s.discountAmount),0) " + "FROM Sale s " + "WHERE s.outletId = :outletId AND s.date BETWEEN :start AND :end")
+    @Query("SELECT COALESCE(" + "SUM(s.discountAmount),0) " + "FROM Sale s " + "WHERE s.outletId = :outletId AND s.status = 'ACTIVE' AND s.date BETWEEN :start AND :end")
     double getTotalDiscount(@Param("outletId") String outletId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
-    @Query("SELECT COUNT(s) FROM Sale s WHERE s.outletId = :outletId AND s.date BETWEEN :start AND :end")
+    @Query("SELECT COUNT(s) FROM Sale s WHERE s.outletId = :outletId AND s.status = 'ACTIVE' AND s.date BETWEEN :start AND :end")
     long getTotalTransactions(@Param("outletId") String outletId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
 
@@ -25,6 +26,9 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
 
     @Query("""
             SELECT 
+                s.invoiceNo,
+                s.status,
+            
                 p.barcode,
                 p.name,
                 SUM(si.value),
@@ -42,8 +46,9 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
             JOIN si.sale s
             JOIN Product p ON p.barcode = si.barcode
             WHERE s.outletId = :outletId
+            AND s.status = 'ACTIVE'
             AND s.date >= :start AND s.date < :end
-            GROUP BY p.barcode, p.name, si.priceType, p.retailPrice, p.bulkPrice
+            GROUP BY s.invoiceNo,s.status, p.barcode, p.name, si.priceType, p.retailPrice, p.bulkPrice
             """)
     List<Object[]> getSoldItemsReport(
             @Param("outletId") String outletId,
@@ -57,4 +62,7 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
             @Param("end") LocalDateTime end,
             @Param("outletId") String outletId
     );
+
+    Optional<Sale> findTopByOrderByDateDesc();
+
 }
