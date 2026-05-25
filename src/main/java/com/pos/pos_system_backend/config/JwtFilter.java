@@ -2,8 +2,6 @@ package com.pos.pos_system_backend.config;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
 
 import java.io.IOException;
 
@@ -16,10 +14,15 @@ public class JwtFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
+    public void doFilter(
+            ServletRequest request,
+            ServletResponse response,
+            FilterChain chain
+    ) throws IOException, ServletException {
 
+        System.out.println("JWT FILTER RUNNING");
         HttpServletRequest req = (HttpServletRequest) request;
+
         String auth = req.getHeader("Authorization");
 
         if (auth != null && auth.startsWith("Bearer ")) {
@@ -29,13 +32,4 @@ public class JwtFilter implements Filter {
 
         chain.doFilter(request, response);
     }
-
-    @Bean
-    public FilterRegistrationBean<JwtFilter> jwtFilter(JwtUtil jwtUtil) {
-        FilterRegistrationBean<JwtFilter> reg = new FilterRegistrationBean<>();
-        reg.setFilter(new JwtFilter(jwtUtil));
-        reg.addUrlPatterns("/api/*");
-        return reg;
-    }
 }
-
