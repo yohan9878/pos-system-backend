@@ -1,7 +1,9 @@
 package com.pos.pos_system_backend.controller;
 
 import com.pos.pos_system_backend.dto.DailyReportResponse;
+import com.pos.pos_system_backend.dto.ProductSaleDetailDto;
 import com.pos.pos_system_backend.dto.SoldItemReport;
+import com.pos.pos_system_backend.dto.StockReportDto;
 import com.pos.pos_system_backend.service.ReportService;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,5 +35,29 @@ public class ReportController {
             @RequestParam String date
     ) {
         return service.getSoldItems(outletId, date);
+    }
+
+    @GetMapping("/day-end-stock")
+    public List<StockReportDto> getDayEndStockReport(
+            @RequestParam String outletId,
+            @RequestParam String date
+    ) {
+        return service.getDayEndStockReport(
+                outletId,
+                date
+        );
+    }
+
+    @GetMapping("/product-sales")
+    public List<ProductSaleDetailDto> getProductSales(
+            @RequestParam String barcode,
+            @RequestParam String outletId,
+            @RequestParam String date
+    ) {
+        return service.getProductSales(
+                barcode,
+                outletId,
+                date
+        );
     }
 }
