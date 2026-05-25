@@ -65,4 +65,71 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
 
     Optional<Sale> findTopByOrderByDateDesc();
 
+
+    @Query("""
+            SELECT
+                si.barcode,
+                COALESCE(SUM(si.value), 0)
+            FROM SaleItem si
+            JOIN si.sale s
+            WHERE s.outletId = :outletId
+            AND s.status = 'ACTIVE'
+            AND s.date >= :start
+            AND s.date < :end
+            GROUP BY si.barcode
+            """)
+    List<Object[]> getStockOutByDate(
+            @Param("outletId") String outletId,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end
+    );
+
+    @Query("""
+            SELECT
+                s.invoiceNo,
+                p.barcode,
+                p.name,
+                s.outletId,
+                s.status,
+                s.date,
+            
+                si.value,
+            
+                CASE
+                    WHEN si.priceType = 'RETAIL'
+                    THEN p.retailPrice
+                    ELSE p.bulkPrice
+                END,
+            
+                (
+                    si.value *
+                    CASE
+                        WHEN si.priceType = 'RETAIL'
+                        THEN p.retailPrice
+                        ELSE p.bulkPrice
+                    END
+                )
+            
+            FROM SaleItem si
+            
+            JOIN si.sale s
+            
+            JOIN Product p
+            ON p.barcode = si.barcode
+            
+            WHERE si.barcode = :barcode
+            AND s.outletId = :outletId
+            AND s.date >= :start
+            AND s.date < :end
+            
+            ORDER BY s.date DESC
+            """)
+    List<Object[]> getProductSales(
+            @Param("barcode") String barcode,
+            @Param("outletId") String outletId,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end
+    );
+
+
 }
