@@ -12,7 +12,7 @@ public class AuthService {
     private final UserRepository repo;
     private final JwtUtil jwtUtil;
 
-    public AuthService(UserRepository repo,  JwtUtil jwtUtil) {
+    public AuthService(UserRepository repo, JwtUtil jwtUtil) {
 
         this.repo = repo;
         this.jwtUtil = jwtUtil;
@@ -26,6 +26,7 @@ public class AuthService {
             throw new RuntimeException("Invalid password");
         }
 
-        return jwtUtil.generateToken(user.getUsername(), user.getRole());
+        return jwtUtil.generateToken(user.getUsername(), user.getRole().name());
     }
+
 }

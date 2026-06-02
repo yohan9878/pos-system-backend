@@ -29,10 +29,11 @@ public class AuthController {
         String token = auth.substring(7);
         Claims claims = jwtUtil.validateToken(token);
 
-        if (!claims.get("role").equals("ADMIN")) {
+        if (!claims.get("role").equals("ADMIN")){
             throw new RuntimeException("Access denied");
         }
 
         return "Welcome Admin";
     }
+
 }

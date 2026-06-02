@@ -77,13 +77,13 @@ public class ReportService {
 
         return results.stream().map(r -> {
             SoldItemReport dto = new SoldItemReport();
-            dto.setInvoiceNo((String) r[0]);
-            dto.setSaleStatus(String.valueOf(r[1]));
-            dto.setBarcode(String.valueOf(r[2]));
-            dto.setItemName((String) r[3]);
-            dto.setSaleQty(((Number) r[4]).doubleValue());
-            dto.setSalePrice(((Number) r[5]).doubleValue());
-            dto.setSaleValue(((Number) r[6]).doubleValue());
+//            dto.setInvoiceNo((String) r[0]);
+//            dto.setSaleStatus(String.valueOf(r[1]));
+            dto.setBarcode(String.valueOf(r[0]));
+            dto.setItemName((String) r[1]);
+            dto.setSaleQty(((Number) r[2]).doubleValue());
+            dto.setSalePrice(((Number) r[3]).doubleValue());
+            dto.setSaleValue(((Number) r[4]).doubleValue());
             return dto;
         }).toList();
     }

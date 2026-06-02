@@ -26,9 +26,6 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
 
     @Query("""
             SELECT 
-                s.invoiceNo,
-                s.status,
-            
                 p.barcode,
                 p.name,
                 SUM(si.value),
@@ -48,7 +45,7 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
             WHERE s.outletId = :outletId
             AND s.status = 'ACTIVE'
             AND s.date >= :start AND s.date < :end
-            GROUP BY s.invoiceNo,s.status, p.barcode, p.name, si.priceType, p.retailPrice, p.bulkPrice
+            GROUP BY p.barcode, p.name, si.priceType, p.retailPrice, p.bulkPrice
             """)
     List<Object[]> getSoldItemsReport(
             @Param("outletId") String outletId,
