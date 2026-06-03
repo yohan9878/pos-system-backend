@@ -29,13 +29,6 @@ public class UserController {
 
         String token = auth.substring(7);
 
-//        String role = jwtUtil.getRoleFromToken(token);
-//
-//        if (!"ADMIN".equals(role)) {
-//            return ResponseEntity.status(403)
-//                    .body("Access denied");
-//        }
-
         UserRole role = jwtUtil.getRoleEnumFromToken(token);
 
         if ((role != UserRole.ADMIN) && (role != UserRole.MANAGER)) {
